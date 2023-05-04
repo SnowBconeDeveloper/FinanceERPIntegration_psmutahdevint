@@ -33,18 +33,27 @@ FinErpUtils.prototype = {
     },
 
     checkIfIntegrationError: function(sys_id, entity) {
-        var integrationErrorRecs = this.getGlideRecords('sn_shop_erp_error_task', {
-            purchase_order: sys_id.toString(),
+		var queryObj = {
             subtype: entity,
             state: 1
-        });
+        };
+		if(entity == 'invoice')
+		queryObj['invoice'] = sys_id.toString();
+
+		if(entity == 'receipt')
+		queryObj['receipt'] = sys_id.toString();
+
+		if(entity == 'purchase_order')
+		queryObj['purchase_order'] = sys_id.toString();
+
+        var integrationErrorRecs = this.getGlideRecords('sn_shop_erp_error_task',queryObj);
         return integrationErrorRecs.hasNext();
     },
 
     isPluginInstalledAndIntError: function(sys_id, entity, pluginList) {
         return (this.checkIfPluginDependeciesInstalled(pluginList) && this.checkIfIntegrationError(sys_id, entity));
     },
-
+	
     checkIfPluginDependeciesInstalled: function(scopeNames) {
         scopeNames.forEach(function(key) {
             var isInstalled = new sn_fcms_intg.FinErpUtils().getGlideRecords('sys_store_app', {
@@ -60,13 +69,13 @@ FinErpUtils.prototype = {
     checkResubmitCondition: function(current, entity) {
         if (current) {
             if (entity == 'GR')
-                return (this.isPluginInstalledAndIntError(current.purchase_order_line.purchase_order.sys_id, 'receipt', ['sn_psm_sap_int']) && current.erp_gr_number == '' && current.status == 'pending_submission');
+                return (this.isPluginInstalledAndIntError(current.sys_id, 'receipt', ['sn_psm_sap_int']) && current.erp_gr_number == '' && current.status == 'pending_submission');
 
             if (entity == "PO")
                 return (this.isPluginInstalledAndIntError(current.sys_id, 'purchase_order', ['sn_psm_sap_int']) && current.status == 'pending_submission' && current.erp_number == '');
 
             if (entity == 'IR')
-                return (this.isPluginInstalledAndIntError(current.purchase_order.sys_id, 'invoice', ['sn_apm_sap_int']) && current.erp_number == '' && current.state == 'approved');
+                return (this.isPluginInstalledAndIntError(current.sys_id, 'invoice', ['sn_apm_sap_int']) && current.erp_number == '' && current.state == 'approved');
 
         }
     },
@@ -76,13 +85,13 @@ FinErpUtils.prototype = {
         <sys_created_by>satya</sys_created_by>
         <sys_created_on>2023-04-18 04:30:57</sys_created_on>
         <sys_id>a0507b0587daad10c04eb259dabb35b7</sys_id>
-        <sys_mod_count>14</sys_mod_count>
+        <sys_mod_count>23</sys_mod_count>
         <sys_name>FinErpUtils</sys_name>
         <sys_package display_value="Finance - ERP Integration" source="sn_fcms_intg">0b4eadd1531113008f12ddeeff7b126d</sys_package>
         <sys_policy/>
         <sys_scope display_value="Finance - ERP Integration">0b4eadd1531113008f12ddeeff7b126d</sys_scope>
         <sys_update_name>sys_script_include_a0507b0587daad10c04eb259dabb35b7</sys_update_name>
-        <sys_updated_by>satya</sys_updated_by>
-        <sys_updated_on>2023-05-03 12:26:39</sys_updated_on>
+        <sys_updated_by>satyasagar.palivela@snc</sys_updated_by>
+        <sys_updated_on>2023-05-03 14:33:22</sys_updated_on>
     </sys_script_include>
 </record_update>
